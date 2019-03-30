@@ -3,18 +3,46 @@ require 'ovto'
 Document = Native(`document`)
 
 class ChatApp < Ovto::App
+  class Handler < ChatChannel::Handler
+    def initialize(app)
+      @app = app
+    end
+
+    def connected
+      puts 'connected'
+    end
+
+    def received(data)
+      puts 'received'
+      d = Native(`data`)
+      name = d[:name]
+      line = d[:line]
+      puts line
+      @app.actions.receive_item(value: {name: name, line: line})
+    end
+  end
+
   def setup
+    handler = Handler.new(self)
+    channel = ChatChannel.new(handler)
     name = Document.getElementById('user').dataset.userName
+
+    actions.set_channel(value: channel)
     actions.set_name(value: name)
   end
 
   class State < Ovto::State
+    item :channel, default: nil
     item :name, default: ''
     item :line, default: ''
     item :items, default: []
   end
 
   class Actions < Ovto::Actions
+    def set_channel(state:, value:)
+      return {channel: value}
+    end
+
     def set_name(state:, value:)
       return {name: value}
     end
@@ -24,7 +52,12 @@ class ChatApp < Ovto::App
     end
 
     def prepend_item(state:)
-      return {items: [{name: state.name, line: state.line}] + state.items, line: ''}
+      state.channel.post(state.name, state.line)
+      return {line: ''}
+    end
+
+    def receive_item(state:, value:)
+      return {items: [{name: value[:name], line: value[:line]}] + state.items}
     end
   end
 
