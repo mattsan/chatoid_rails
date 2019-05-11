@@ -1,7 +1,7 @@
 <h1>Chatoid</h1>
 
 <%= label :name, '名前を入力してください' %>
-<div class="row">
-  <%= text_field_tag :name %>
-  <%= button_tag '入室', id: 'enter-button' %>
+<div class="row" data-controller="home">
+  <%= text_field_tag :name, '', data: {target: 'home.name', action: 'home#enter'} %>
+  <%= button_tag '入室', data: {action: 'home#enter'} %>
 </div>
