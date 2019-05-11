@@ -1,2 +1,9 @@
-<h1 id="user" data-user-name="<%= @name %>">Chatoid</h1>
-<div id="ovto"></div>
+<h1>Chatoid</h1>
+<div data-controller="chat" data-chat-user="<%= @name %>">
+  <div class="row">
+    <input type="text" data-action="chat#post" data-target="chat.line">
+    <button data-action="chat#post">POST</button>
+  </div>
+  <ul data-target="chat.items">
+  </ul>
+</div>
